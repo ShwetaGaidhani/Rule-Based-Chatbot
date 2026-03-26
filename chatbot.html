@@ -1,0 +1,1008 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TechBot - AI Assistant</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .chat-container {
+            width: 100%;
+            max-width: 900px;
+            height: 90vh;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .chat-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .bot-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .bot-avatar {
+            width: 50px;
+            height: 50px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+
+        .bot-details h1 {
+            font-size: 22px;
+            margin-bottom: 5px;
+        }
+
+        .bot-status {
+            font-size: 13px;
+            opacity: 0.9;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .status-indicator {
+            width: 8px;
+            height: 8px;
+            background: #00ff88;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .header-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.3s;
+        }
+
+        .header-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 30px;
+            background: #f8f9fa;
+        }
+
+        .message {
+            margin-bottom: 20px;
+            display: flex;
+            animation: fadeIn 0.3s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .message.bot {
+            justify-content: flex-start;
+        }
+
+        .message.user {
+            justify-content: flex-end;
+        }
+
+        .message-content {
+            max-width: 70%;
+            padding: 15px 20px;
+            border-radius: 18px;
+            position: relative;
+        }
+
+        .message.bot .message-content {
+            background: white;
+            border-bottom-left-radius: 4px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .message.user .message-content {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+
+        .message-text {
+            margin-bottom: 8px;
+            line-height: 1.5;
+        }
+
+        .message-time {
+            font-size: 11px;
+            opacity: 0.6;
+            text-align: right;
+        }
+
+        .message.bot .message-time {
+            color: #666;
+        }
+
+        .typing-indicator {
+            display: none;
+            padding: 15px 20px;
+            background: white;
+            border-radius: 18px;
+            border-bottom-left-radius: 4px;
+            max-width: 70px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .typing-indicator.active {
+            display: flex;
+            gap: 5px;
+            align-items: center;
+        }
+
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            background: #667eea;
+            border-radius: 50%;
+            animation: typing 1.4s infinite;
+        }
+
+        .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+        .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+        @keyframes typing {
+            0%, 60%, 100% { transform: translateY(0); }
+            30% { transform: translateY(-10px); }
+        }
+
+        .chat-input-container {
+            padding: 20px;
+            background: white;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .quick-replies {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .quick-reply {
+            background: #f0f0f0;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.3s;
+            color: #333;
+        }
+
+        .quick-reply:hover {
+            background: #667eea;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .input-wrapper {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .chat-input {
+            flex: 1;
+            padding: 15px 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 25px;
+            font-size: 15px;
+            transition: border-color 0.3s;
+            outline: none;
+        }
+
+        .chat-input:focus {
+            border-color: #667eea;
+        }
+
+        .send-btn {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 50%;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .send-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .send-btn:active {
+            transform: scale(0.95);
+        }
+
+        .welcome-message {
+            text-align: center;
+            padding: 40px 20px;
+            color: #666;
+        }
+
+        .welcome-message h2 {
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+
+        .welcome-message p {
+            margin-bottom: 10px;
+            line-height: 1.6;
+        }
+
+        .intent-badge {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 10px;
+            margin-right: 5px;
+            margin-bottom: 5px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+            width: 90%;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-header h2 {
+            color: #667eea;
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #999;
+        }
+
+        .log-entry {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            border-left: 4px solid #667eea;
+        }
+
+        .log-timestamp {
+            color: #999;
+            font-size: 12px;
+            margin-bottom: 8px;
+        }
+
+        .log-text {
+            margin: 5px 0;
+        }
+
+        .log-text.user {
+            color: #667eea;
+            font-weight: 600;
+        }
+
+        .log-text.bot {
+            color: #333;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .stat-card {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 13px;
+        }
+
+        @media (max-width: 768px) {
+            .chat-container {
+                height: 100vh;
+                border-radius: 0;
+            }
+
+            .message-content {
+                max-width: 85%;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <div class="chat-header">
+            <div class="bot-info">
+                <div class="bot-avatar">🤖</div>
+                <div class="bot-details">
+                    <h1>TechBot AI</h1>
+                    <div class="bot-status">
+                        <span class="status-indicator"></span>
+                        <span>Online • Ready to help</span>
+                    </div>
+                </div>
+            </div>
+            <div class="header-actions">
+                <button class="header-btn" onclick="showHistory()">📜 History</button>
+                <button class="header-btn" onclick="clearChat()">🗑️ Clear</button>
+            </div>
+        </div>
+
+        <div class="chat-messages" id="chatMessages">
+            <div class="welcome-message">
+                <h2>👋 Welcome to TechBot AI!</h2>
+                <p>I'm your intelligent assistant with expertise in technology and programming.</p>
+                <p>I can help you with:</p>
+                <p>
+                    <span class="intent-badge">Greetings</span>
+                    <span class="intent-badge">Tech Questions</span>
+                    <span class="intent-badge">Programming</span>
+                    <span class="intent-badge">Small Talk</span>
+                    <span class="intent-badge">Help & Support</span>
+                </p>
+                <p style="margin-top: 20px; color: #999; font-size: 14px;">Try asking me something or use the quick replies below!</p>
+            </div>
+            <div class="typing-indicator" id="typingIndicator">
+                <div class="typing-dot"></div>
+                <div class="typing-dot"></div>
+                <div class="typing-dot"></div>
+            </div>
+        </div>
+
+        <div class="chat-input-container">
+            <div class="quick-replies" id="quickReplies">
+                <button class="quick-reply" onclick="sendQuickReply('Hello!')">👋 Hello</button>
+                <button class="quick-reply" onclick="sendQuickReply('What is Python?')">🐍 Python?</button>
+                <button class="quick-reply" onclick="sendQuickReply('Help me')">❓ Help</button>
+                <button class="quick-reply" onclick="sendQuickReply('Tell me a joke')">😄 Joke</button>
+            </div>
+            <div class="input-wrapper">
+                <input 
+                    type="text" 
+                    class="chat-input" 
+                    id="userInput" 
+                    placeholder="Type your message here..."
+                    autocomplete="off"
+                />
+                <button class="send-btn" onclick="sendMessage()">➤</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- History Modal -->
+    <div class="modal" id="historyModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>📜 Conversation History</h2>
+                <button class="close-modal" onclick="closeHistory()">✕</button>
+            </div>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-value" id="totalMessages">0</div>
+                    <div class="stat-label">Total Messages</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="totalIntents">0</div>
+                    <div class="stat-label">Intents Detected</div>
+                </div>
+            </div>
+            <div id="historyContent"></div>
+        </div>
+    </div>
+
+    <script>
+        // Rule-Based Chatbot Engine
+        class RuleBasedChatbot {
+            constructor() {
+                this.conversationHistory = [];
+                this.intentCounts = {};
+                this.knowledgeBase = this.initializeKnowledgeBase();
+                this.patterns = this.initializePatterns();
+            }
+
+            initializeKnowledgeBase() {
+                return {
+                    // Programming Languages
+                    'python': {
+                        definition: 'Python is a high-level, interpreted programming language known for its simplicity and readability. Created by Guido van Rossum in 1991.',
+                        features: ['Easy to learn', 'Versatile', 'Large standard library', 'Great for AI/ML'],
+                        uses: 'Web development, Data Science, AI/ML, Automation, Scripting'
+                    },
+                    'javascript': {
+                        definition: 'JavaScript is a dynamic programming language primarily used for web development. It runs in browsers and on servers (Node.js).',
+                        features: ['Event-driven', 'Asynchronous', 'Prototype-based', 'Multi-paradigm'],
+                        uses: 'Web development, Mobile apps, Game development, Server-side'
+                    },
+                    'java': {
+                        definition: 'Java is a class-based, object-oriented programming language designed to have few implementation dependencies.',
+                        features: ['Platform independent', 'Object-oriented', 'Secure', 'Robust'],
+                        uses: 'Enterprise applications, Android apps, Web servers, Big data'
+                    },
+                    'c++': {
+                        definition: 'C++ is a general-purpose programming language created as an extension of C with object-oriented features.',
+                        features: ['High performance', 'Low-level control', 'Object-oriented', 'Generic programming'],
+                        uses: 'System software, Game development, Real-time systems, Embedded systems'
+                    },
+
+                    // Technologies
+                    'ai': {
+                        definition: 'Artificial Intelligence (AI) is the simulation of human intelligence processes by machines, especially computer systems.',
+                        subfields: ['Machine Learning', 'Deep Learning', 'Natural Language Processing', 'Computer Vision'],
+                        applications: 'Virtual assistants, Self-driving cars, Medical diagnosis, Recommendation systems'
+                    },
+                    'machine learning': {
+                        definition: 'Machine Learning is a subset of AI that enables systems to learn and improve from experience without being explicitly programmed.',
+                        types: ['Supervised Learning', 'Unsupervised Learning', 'Reinforcement Learning'],
+                        algorithms: 'Neural Networks, Decision Trees, SVM, Random Forests'
+                    },
+                    'api': {
+                        definition: 'API (Application Programming Interface) is a set of protocols and tools for building software applications.',
+                        types: ['REST API', 'SOAP API', 'GraphQL', 'WebSocket'],
+                        purpose: 'Enables communication between different software systems'
+                    },
+                    'database': {
+                        definition: 'A database is an organized collection of structured data stored electronically.',
+                        types: ['SQL (MySQL, PostgreSQL)', 'NoSQL (MongoDB, Redis)', 'Graph databases', 'Time-series databases'],
+                        uses: 'Data storage, Data retrieval, Data management, Analytics'
+                    },
+
+                    // Concepts
+                    'algorithm': {
+                        definition: 'An algorithm is a step-by-step procedure or formula for solving a problem or completing a task.',
+                        characteristics: ['Finite', 'Well-defined', 'Effective', 'Independent'],
+                        examples: 'Sorting, Searching, Graph traversal, Dynamic programming'
+                    },
+                    'cloud computing': {
+                        definition: 'Cloud computing is the delivery of computing services over the internet (the cloud).',
+                        services: ['IaaS', 'PaaS', 'SaaS'],
+                        providers: 'AWS, Google Cloud, Microsoft Azure, IBM Cloud'
+                    },
+                    'git': {
+                        definition: 'Git is a distributed version control system for tracking changes in source code during software development.',
+                        features: ['Branching', 'Merging', 'Distributed', 'Fast'],
+                        commands: 'git add, git commit, git push, git pull, git merge'
+                    }
+                };
+            }
+
+            initializePatterns() {
+                return {
+                    // Greeting Intent
+                    greeting: {
+                        patterns: [
+                            /^(hi|hello|hey|greetings|good\s+(morning|afternoon|evening)|howdy|sup|yo)/i,
+                            /^(what's up|whats up|how are you|how do you do)/i
+                        ],
+                        responses: [
+                            "Hello! 👋 How can I help you today?",
+                            "Hi there! I'm TechBot, ready to assist you!",
+                            "Hey! Great to see you! What can I do for you?",
+                            "Greetings! How may I be of service?",
+                            "Hello! Ask me anything about technology and programming!"
+                        ]
+                    },
+
+                    // Farewell Intent
+                    farewell: {
+                        patterns: [
+                            /^(bye|goodbye|see you|farewell|take care|later|exit|quit)/i,
+                            /^(good night|gn|have a good day|catch you later)/i
+                        ],
+                        responses: [
+                            "Goodbye! Feel free to come back anytime! 👋",
+                            "See you later! Happy coding! 💻",
+                            "Take care! Don't hesitate to return if you need help!",
+                            "Bye! It was great chatting with you!",
+                            "Farewell! Keep learning and building great things! 🚀"
+                        ]
+                    },
+
+                    // Help Intent
+                    help: {
+                        patterns: [
+                            /^(help|assist|support|guide|what can you do|your capabilities)/i,
+                            /^(how do you work|how to use|instructions|commands)/i,
+                            /^(i need help|can you help)/i
+                        ],
+                        responses: [
+                            "I can help you with:\n• Programming languages (Python, JavaScript, Java, C++)\n• Tech concepts (AI, ML, APIs, Databases)\n• General tech questions\n• Small talk and jokes!\n\nJust ask me anything!",
+                            "Here's what I can do:\n✓ Explain programming concepts\n✓ Discuss technologies\n✓ Answer tech questions\n✓ Have friendly conversations\n\nTry asking: 'What is Python?' or 'Tell me about AI'",
+                            "I'm here to help! You can:\n• Ask about programming languages\n• Learn about tech concepts\n• Get explanations of algorithms\n• Chat casually\n\nWhat would you like to know?"
+                        ]
+                    },
+
+                    // Thanks Intent
+                    thanks: {
+                        patterns: [
+                            /^(thanks|thank you|thx|appreciate|grateful)/i,
+                            /^(thanks a lot|many thanks|thanks so much)/i
+                        ],
+                        responses: [
+                            "You're welcome! Happy to help! 😊",
+                            "My pleasure! Feel free to ask more questions!",
+                            "Glad I could help! Anything else?",
+                            "You're very welcome! That's what I'm here for!",
+                            "No problem at all! Keep the questions coming!"
+                        ]
+                    },
+
+                    // Identity/About Intent
+                    about_bot: {
+                        patterns: [
+                            /^(who are you|what are you|your name|introduce yourself)/i,
+                            /^(tell me about yourself|what is your purpose)/i,
+                            /^(are you (a )?bot|are you (an )?ai)/i
+                        ],
+                        responses: [
+                            "I'm TechBot, a rule-based AI assistant! 🤖 I use pattern matching to understand your questions and provide helpful responses about technology and programming.",
+                            "I'm an AI chatbot specialized in technology topics. I'm built using rule-based pattern matching and have a knowledge base of programming and tech concepts!",
+                            "Call me TechBot! I'm here to answer your tech questions, explain programming concepts, and have friendly conversations. I'm powered by pattern matching rules!"
+                        ]
+                    },
+
+                    // Joke Intent
+                    joke: {
+                        patterns: [
+                            /^(tell me a joke|joke|make me laugh|something funny|humor)/i,
+                            /^(got any jokes|do you know jokes)/i
+                        ],
+                        responses: [
+                            "Why do programmers prefer dark mode? Because light attracts bugs! 😄🐛",
+                            "Why did the programmer quit his job? Because he didn't get arrays! 😂",
+                            "How many programmers does it take to change a light bulb? None, that's a hardware problem! 💡",
+                            "What's a programmer's favorite hangout place? Foo Bar! 🍺",
+                            "Why do Java developers wear glasses? Because they can't C#! 👓😄",
+                            "A SQL query walks into a bar, walks up to two tables and asks: 'Can I JOIN you?' 🍻"
+                        ]
+                    },
+
+                    // Compliment Intent
+                    compliment: {
+                        patterns: [
+                            /^(you are (great|awesome|amazing|cool|smart|brilliant|helpful))/i,
+                            /^(good bot|nice bot|you're the best)/i,
+                            /^(i like you|you rock)/i
+                        ],
+                        responses: [
+                            "Thank you! You're pretty awesome yourself! 🌟",
+                            "Aww, thanks! You made my circuits happy! 😊",
+                            "You're too kind! I'm just doing my job! 🤖",
+                            "Thanks! I really appreciate that! Keep being awesome!"
+                        ]
+                    },
+
+                    // Mood/Feeling Intent
+                    mood: {
+                        patterns: [
+                            /^(how are you|how do you feel|are you okay|you good)/i,
+                            /^(what's your mood|how's it going)/i
+                        ],
+                        responses: [
+                            "I'm doing great! All systems operational! 🚀 How about you?",
+                            "Feeling fantastic! Ready to help with any tech questions! 😊",
+                            "I'm excellent! My databases are optimized and I'm ready to chat! 💪",
+                            "Running at peak performance! What can I help you with today?"
+                        ]
+                    },
+
+                    // Small Talk - Weather
+                    weather: {
+                        patterns: [
+                            /^(how's the weather|what's the weather|weather|is it raining|is it sunny)/i
+                        ],
+                        responses: [
+                            "I don't have access to weather data, but I hope it's nice where you are! ☀️ Want to talk about something tech-related instead?",
+                            "As a chatbot, I live in the cloud! ☁️ But I can't check the weather. How about we discuss cloud computing instead? 😄"
+                        ]
+                    },
+
+                    // Programming Question Pattern
+                    programming_question: {
+                        patterns: [
+                            /what is (python|javascript|java|c\+\+|ruby|go|rust|swift)/i,
+                            /tell me about (python|javascript|java|c\+\+)/i,
+                            /explain (python|javascript|java|c\+\+)/i
+                        ],
+                        handler: (match) => this.handleKnowledgeQuery(match[1])
+                    },
+
+                    // Technology Question Pattern
+                    tech_question: {
+                        patterns: [
+                            /what is (ai|machine learning|api|database|git|cloud computing|algorithm)/i,
+                            /tell me about (ai|machine learning|api|database|git)/i,
+                            /explain (ai|machine learning|api|database|algorithm)/i
+                        ],
+                        handler: (match) => this.handleKnowledgeQuery(match[1])
+                    },
+
+                    // Learning Intent
+                    learning: {
+                        patterns: [
+                            /^(i want to learn|teach me|how to learn|how do i start)/i,
+                            /^(best way to learn|where to start|beginner)/i
+                        ],
+                        responses: [
+                            "Great mindset! 🎓 For programming, I recommend:\n1. Start with Python (beginner-friendly)\n2. Practice daily with small projects\n3. Use resources like freeCodeCamp, Codecademy\n4. Build real projects\n\nWhat specifically interests you?",
+                            "Awesome! Learning is the best investment! 💡 Pick a language (Python is great for beginners), do tutorials, code every day, and build projects. What would you like to learn?",
+                            "Perfect! Start with the basics, practice consistently, and don't be afraid to make mistakes. Would you like recommendations for a specific topic?"
+                        ]
+                    },
+
+                    // Time Intent
+                    time: {
+                        patterns: [
+                            /^(what time|what's the time|current time|time now)/i,
+                            /^(what day|what date|today's date)/i
+                        ],
+                        handler: () => {
+                            const now = new Date();
+                            return `The current time is ${now.toLocaleTimeString()} and today is ${now.toLocaleDateString()}. ⏰`;
+                        }
+                    }
+                };
+            }
+
+            handleKnowledgeQuery(topic) {
+                const normalizedTopic = topic.toLowerCase().trim();
+                const knowledge = this.knowledgeBase[normalizedTopic];
+
+                if (knowledge) {
+                    let response = `📚 ${topic.toUpperCase()}\n\n`;
+                    response += `${knowledge.definition}\n\n`;
+
+                    if (knowledge.features) {
+                        response += `✨ Key Features:\n${knowledge.features.map(f => `• ${f}`).join('\n')}\n\n`;
+                    }
+
+                    if (knowledge.types) {
+                        response += `📂 Types:\n${knowledge.types.map(t => `• ${t}`).join('\n')}\n\n`;
+                    }
+
+                    if (knowledge.subfields) {
+                        response += `🔬 Subfields:\n${knowledge.subfields.map(s => `• ${s}`).join('\n')}\n\n`;
+                    }
+
+                    if (knowledge.uses) {
+                        response += `💼 Uses: ${knowledge.uses}`;
+                    }
+
+                    if (knowledge.applications) {
+                        response += `💼 Applications: ${knowledge.applications}`;
+                    }
+
+                    if (knowledge.algorithms) {
+                        response += `🧮 Common Algorithms: ${knowledge.algorithms}`;
+                    }
+
+                    return response;
+                }
+
+                return null;
+            }
+
+            matchPattern(userInput) {
+                const input = userInput.trim();
+
+                // Try each intent
+                for (const [intentName, intent] of Object.entries(this.patterns)) {
+                    for (const pattern of intent.patterns) {
+                        const match = input.match(pattern);
+                        if (match) {
+                            // Track intent
+                            this.intentCounts[intentName] = (this.intentCounts[intentName] || 0) + 1;
+
+                            // Handle custom handlers
+                            if (intent.handler) {
+                                const response = intent.handler(match);
+                                if (response) {
+                                    return { response, intent: intentName };
+                                }
+                            }
+
+                            // Random response from array
+                            if (intent.responses) {
+                                const response = intent.responses[Math.floor(Math.random() * intent.responses.length)];
+                                return { response, intent: intentName };
+                            }
+                        }
+                    }
+                }
+
+                // Default fallback
+                return {
+                    response: this.getFallbackResponse(input),
+                    intent: 'unknown'
+                };
+            }
+
+            getFallbackResponse(input) {
+                const fallbacks = [
+                    "I'm not sure I understand. Could you rephrase that? Try asking about programming languages, tech concepts, or type 'help' for guidance! 🤔",
+                    "Hmm, that's interesting but I'm not quite sure how to respond. Ask me about Python, JavaScript, AI, or other tech topics! 💡",
+                    "I didn't quite catch that. I'm best at discussing technology and programming. What would you like to know? 🖥️",
+                    "That's outside my knowledge base. Try asking: 'What is Python?' or 'Tell me about AI' or 'Help' to see what I can do! 🤖"
+                ];
+
+                return fallbacks[Math.floor(Math.random() * fallbacks.length)];
+            }
+
+            chat(userInput) {
+                const timestamp = new Date().toISOString();
+                
+                // Log user message
+                this.conversationHistory.push({
+                    role: 'user',
+                    message: userInput,
+                    timestamp: timestamp
+                });
+
+                // Get response
+                const { response, intent } = this.matchPattern(userInput);
+
+                // Log bot response
+                this.conversationHistory.push({
+                    role: 'bot',
+                    message: response,
+                    intent: intent,
+                    timestamp: new Date().toISOString()
+                });
+
+                return { response, intent };
+            }
+
+            getHistory() {
+                return this.conversationHistory;
+            }
+
+            getStats() {
+                return {
+                    totalMessages: this.conversationHistory.length,
+                    intentCounts: this.intentCounts,
+                    totalIntents: Object.keys(this.intentCounts).length
+                };
+            }
+
+            clearHistory() {
+                this.conversationHistory = [];
+                this.intentCounts = {};
+            }
+
+            exportHistory() {
+                const log = this.conversationHistory.map(entry => {
+                    return `[${entry.timestamp}] ${entry.role.toUpperCase()}: ${entry.message}${entry.intent ? ` (Intent: ${entry.intent})` : ''}`;
+                }).join('\n');
+
+                return log;
+            }
+        }
+
+        // Initialize chatbot
+        const chatbot = new RuleBasedChatbot();
+
+        // UI Functions
+        function addMessage(text, sender) {
+            const messagesDiv = document.getElementById('chatMessages');
+            const welcomeMsg = document.querySelector('.welcome-message');
+            
+            if (welcomeMsg) {
+                welcomeMsg.remove();
+            }
+
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${sender}`;
+
+            const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+            messageDiv.innerHTML = `
+                <div class="message-content">
+                    <div class="message-text">${text.replace(/\n/g, '<br>')}</div>
+                    <div class="message-time">${time}</div>
+                </div>
+            `;
+
+            messagesDiv.insertBefore(messageDiv, document.getElementById('typingIndicator'));
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }
+
+        function showTyping() {
+            document.getElementById('typingIndicator').classList.add('active');
+            document.getElementById('chatMessages').scrollTop = document.getElementById('chatMessages').scrollHeight;
+        }
+
+        function hideTyping() {
+            document.getElementById('typingIndicator').classList.remove('active');
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('userInput');
+            const message = input.value.trim();
+
+            if (!message) return;
+
+            // Add user message
+            addMessage(message, 'user');
+            input.value = '';
+
+            // Show typing indicator
+            showTyping();
+
+            // Simulate thinking delay
+            setTimeout(() => {
+                const { response, intent } = chatbot.chat(message);
+                hideTyping();
+                addMessage(response, 'bot');
+            }, 500 + Math.random() * 1000);
+        }
+
+        function sendQuickReply(message) {
+            document.getElementById('userInput').value = message;
+            sendMessage();
+        }
+
+        function clearChat() {
+            if (confirm('Clear all messages? This will reset the conversation.')) {
+                const messagesDiv = document.getElementById('chatMessages');
+                messagesDiv.innerHTML = `
+                    <div class="welcome-message">
+                        <h2>👋 Chat Cleared!</h2>
+                        <p>Start a new conversation. I'm ready to help!</p>
+                    </div>
+                    <div class="typing-indicator" id="typingIndicator">
+                        <div class="typing-dot"></div>
+                        <div class="typing-dot"></div>
+                        <div class="typing-dot"></div>
+                    </div>
+                `;
+                chatbot.clearHistory();
+            }
+        }
+
+        function showHistory() {
+            const history = chatbot.getHistory();
+            const stats = chatbot.getStats();
+            const modal = document.getElementById('historyModal');
+            const content = document.getElementById('historyContent');
+
+            document.getElementById('totalMessages').textContent = stats.totalMessages;
+            document.getElementById('totalIntents').textContent = stats.totalIntents;
+
+            if (history.length === 0) {
+                content.innerHTML = '<p style="text-align: center; color: #999; padding: 40px;">No conversation history yet.</p>';
+            } else {
+                content.innerHTML = history.map(entry => `
+                    <div class="log-entry">
+                        <div class="log-timestamp">${new Date(entry.timestamp).toLocaleString()}</div>
+                        <div class="log-text ${entry.role}">${entry.role.toUpperCase()}: ${entry.message}</div>
+                        ${entry.intent ? `<div style="margin-top: 8px;"><span class="intent-badge">${entry.intent}</span></div>` : ''}
+                    </div>
+                `).join('');
+            }
+
+            modal.classList.add('active');
+        }
+
+        function closeHistory() {
+            document.getElementById('historyModal').classList.remove('active');
+        }
+
+        // Enter key to send
+        document.getElementById('userInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+
+        // Close modal on outside click
+        document.getElementById('historyModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeHistory();
+            }
+        });
+    </script>
+</body>
+</html>
