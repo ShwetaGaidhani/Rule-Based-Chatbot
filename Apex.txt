@@ -1,0 +1,377 @@
+// =====================================================
+// 1. Display a Welcome Message
+// =====================================================
+
+public class WelcomeMessage {
+
+    public static void showMessage() {
+
+        System.debug('Welcome to Apex Programming');
+
+    }
+}
+
+/*
+Execute Anonymous Window
+
+WelcomeMessage.showMessage();
+*/
+
+
+// =====================================================
+// 2. Add Two Numbers
+// =====================================================
+
+public class AdditionProgram {
+
+    public static void addNumbers() {
+
+        Integer a = 10;
+        Integer b = 20;
+
+        Integer sum = a + b;
+
+        System.debug('Sum = ' + sum);
+
+    }
+
+    // Parameterized Version
+    public static void addNumbers(Integer a, Integer b) {
+
+        Integer sum = a + b;
+
+        System.debug('Sum = ' + sum);
+
+    }
+}
+
+/*
+Execute Anonymous Window
+
+AdditionProgram.addNumbers(10, 20);
+*/
+
+
+// =====================================================
+// 3. Find Whether a Number is Even or Odd
+// =====================================================
+
+public class EvenOddProgram {
+
+    public static void checkNumber() {
+
+        Integer num = 15;
+
+        if(Math.mod(num, 2) == 0) {
+
+            System.debug(num + ' is Even');
+
+        } else {
+
+            System.debug(num + ' is Odd');
+
+        }
+    }
+
+    // Parameterized Version
+    public static void checkNumber(Integer num) {
+
+        if(Math.mod(num, 2) == 0) {
+
+            System.debug(num + ' is Even');
+
+        } else {
+
+            System.debug(num + ' is Odd');
+
+        }
+    }
+}
+
+/*
+Execute Anonymous Window
+
+EvenOddProgram.checkNumber(15);
+*/
+
+
+// =====================================================
+// 4. Find the Largest of Two Numbers
+// =====================================================
+
+public class LargestNumber {
+
+    public static void findLargest() {
+
+        Integer a = 45;
+        Integer b = 28;
+
+        if(a > b) {
+
+            System.debug(a + ' is larger');
+
+        } else {
+
+            System.debug(b + ' is larger');
+
+        }
+    }
+
+    // Parameterized Version
+    public static void findLargest(Integer a, Integer b) {
+
+        if(a > b) {
+
+            System.debug(a + ' is larger');
+
+        } else {
+
+            System.debug(b + ' is larger');
+
+        }
+    }
+}
+
+/*
+Execute Anonymous Window
+
+LargestNumber.findLargest(45, 28);
+*/
+
+
+// =====================================================
+// 5. Print Numbers from 1 to 10
+// =====================================================
+
+public class PrintNumbers {
+
+    public static void showNumbers() {
+
+        for(Integer i = 1; i <= 10; i++) {
+
+            System.debug(i);
+
+        }
+    }
+
+    // Parameterized Version
+    public static void showNumbers(Integer start, Integer end) {
+
+        for(Integer i = start; i <= end; i++) {
+
+            System.debug(i);
+
+        }
+    }
+}
+
+/*
+Execute Anonymous Window
+
+PrintNumbers.showNumbers(1, 10);
+*/
+
+
+// =====================================================
+// 6. Find the Factorial of a Number
+// =====================================================
+
+public class FactorialProgram {
+
+    public static void calculateFactorial() {
+
+        Integer num = 5;
+        Integer fact = 1;
+
+        for(Integer i = 1; i <= num; i++) {
+
+            fact = fact * i;
+
+        }
+
+        System.debug('Factorial = ' + fact);
+    }
+
+    // Parameterized Version
+    public static void calculateFactorial(Integer num) {
+
+        Integer fact = 1;
+
+        for(Integer i = 1; i <= num; i++) {
+
+            fact = fact * i;
+
+        }
+
+        System.debug('Factorial = ' + fact);
+    }
+}
+
+/*
+Execute Anonymous Window
+
+FactorialProgram.calculateFactorial(5);
+*/
+
+
+// =====================================================
+// 7. Reverse a String
+// =====================================================
+
+public class ReverseString {
+
+    public static void reverseText() {
+
+        String str = 'Apex';
+        String rev = '';
+
+        for(Integer i = str.length() - 1; i >= 0; i--) {
+
+            rev += str.substring(i, i + 1);
+
+        }
+
+        System.debug('Reversed String = ' + rev);
+    }
+
+    // Parameterized Version
+    public static void reverseText(String str) {
+
+        String rev = '';
+
+        for(Integer i = str.length() - 1; i >= 0; i--) {
+
+            rev += str.substring(i, i + 1);
+
+        }
+
+        System.debug('Reversed String = ' + rev);
+    }
+}
+
+/*
+Execute Anonymous Window
+
+ReverseString.reverseText('Apex');
+*/
+
+
+// =====================================================
+// 8. Count the Number of Characters in a String
+// =====================================================
+
+public class CharacterCount {
+
+    public static void countCharacters() {
+
+        String text = 'Salesforce';
+
+        Integer count = text.length();
+
+        System.debug('Number of characters = ' + count);
+    }
+
+    // Parameterized Version
+    public static void countCharacters(String text) {
+
+        Integer count = text.length();
+
+        System.debug('Number of characters = ' + count);
+    }
+}
+
+/*
+Execute Anonymous Window
+
+CharacterCount.countCharacters('Salesforce');
+*/
+
+
+// =====================================================
+// 9. Store and Display Student Names Using List
+// =====================================================
+
+public class StudentListProgram {
+
+    public static void displayStudents() {
+
+        List<String> students = new List<String>();
+
+        students.add('Rahul');
+        students.add('Priya');
+        students.add('Amit');
+
+        for(String name : students) {
+
+            System.debug(name);
+
+        }
+    }
+
+    // Parameterized Version
+    public static void displayStudents(List<String> students) {
+
+        for(String name : students) {
+
+            System.debug(name);
+
+        }
+    }
+}
+
+/*
+Execute Anonymous Window
+
+List<String> names = new List<String>();
+
+names.add('Sakshi');
+names.add('Pranjal');
+names.add('Pratima');
+
+StudentListProgram.displayStudents(names);
+*/
+
+
+// =====================================================
+// 10. Find the Sum of Elements in a List
+// =====================================================
+
+public class SumOfList {
+
+    public static void calculateSum() {
+
+        List<Integer> numbers = new List<Integer>{10, 20, 30, 40};
+
+        Integer sum = 0;
+
+        for(Integer num : numbers) {
+
+            sum += num;
+
+        }
+
+        System.debug('Total Sum = ' + sum);
+    }
+
+    // Parameterized Version
+    public static void calculateSum(List<Integer> numbers) {
+
+        Integer sum = 0;
+
+        for(Integer num : numbers) {
+
+            sum += num;
+
+        }
+
+        System.debug('Total Sum = ' + sum);
+    }
+}
+
+/*
+Execute Anonymous Window
+
+List<Integer> nums = new List<Integer>{10, 20, 30, 40};
+
+SumOfList.calculateSum(nums);
+*/
